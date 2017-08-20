@@ -5,7 +5,7 @@
 #define OFFLINE 0
 #define ONLINE 1
 int toll[24];
-typedef char name[10];
+typedef char name[20];
 typedef char state_name[10];
 typedef struct phone_bill_node* ptrto_bill_node;
 typedef ptrto_bill_node phone_bill;
@@ -92,10 +92,11 @@ int calculate_toll(ptrto_bill_node pre, ptrto_bill_node ptr, int *tm)
 	}else if(pre->day == ptr->day){
 		int hour = pre->hour;
 		int minute = pre->minute;
-		for(; hour < ptr->hour; hour++){
-			*tm = *tm + 60 - minute;
-			total_toll = total_toll + (60 - minute) * toll[hour];
-			minute = 0;
+		total_toll = (60 - minute) * toll[hour];
+		*tm = 60 - minute;
+		for(hour++; hour < ptr->hour; hour++){
+			*tm = *tm + 60;
+			total_toll = total_toll + 60 * toll[hour];
 		}
 		total_toll = total_toll + ptr->minute * toll[ptr->hour];
 		*tm = *tm + ptr->minute;
@@ -104,11 +105,12 @@ int calculate_toll(ptrto_bill_node pre, ptrto_bill_node ptr, int *tm)
 		day = pre->day;
 		hour = pre->hour;
 		minute = pre->minute;
-		// 该for循环算出prev 当天所需要的费用
-		for(; hour < 24; hour++){
-			*tm = *tm + 60 - minute;
-			total_toll = total_toll + (60 - minute) * toll[hour];
-			minute = 0;
+		// 算出prev 当天所需要的费用
+		total_toll = (60 - minute) * toll[hour];
+		*tm = 60 - minute;
+		for(hour++; hour < 24; hour++){
+			*tm = *tm + 60;
+			total_toll = total_toll + 60* toll[hour];
 		}
 		// 算出中间天数的费用
 		day = day + 1;
@@ -123,8 +125,7 @@ int calculate_toll(ptrto_bill_node pre, ptrto_bill_node ptr, int *tm)
 			}
 		}
 		// 算出最后一天的费用
-		hour = 0;
-		for(; hour < ptr->hour; hour++){
+		for(hour = 0; hour < ptr->hour; hour++){
 			total_toll = total_toll + toll[hour] * 60;
 			*tm = *tm + 60;
 		}
@@ -149,31 +150,33 @@ int main(int argc, char const *argv[])
 	}
 	ptrto_bill_node prev ;
 	ptrto_bill_node ptr = bill_list->next;
-	int print_name_flag = 1;
-	int print_total_flag = 0;
-	while(ptr->next){
-		prev = ptr;
-		ptr = ptr->next;
-		float total_amount = 0;
-		while(strcmp(ptr->_name, prev->_name) == 0 && ptr->next){
-			if(prev->state == ONLINE && ptr->state == OFFLINE){
-				if(print_name_flag){
-					printf("%s %02d\n", ptr->_name, ptr->month);
-					print_name_flag = 0;
-				}
-				int total_minute = 0;
-				int toll = calculate_toll(prev, ptr, &total_minute);
-				total_amount += toll;
-				printf("%02d:%02d:%02d %02d:%02d:%02d %d $%0.2f\n", prev->day, prev->hour, prev->minute, ptr->day, ptr->hour, ptr->minute, total_minute, (float)toll/100);
-				print_total_flag = 1;
-			}
+
+	if(ptr->next != NULL){
+		while(ptr){
 			prev = ptr;
-			if(ptr->next)
+			ptr = ptr->next;
+			float total_amount = 0;
+			int print_name_flag = 1;
+			int print_total_flag = 0;
+			while(ptr && strcmp(ptr->_name, prev->_name) == 0){
+				if(prev->state == ONLINE && ptr->state == OFFLINE){
+					if(print_name_flag){
+						printf("%s %02d\n", ptr->_name, ptr->month);
+						print_name_flag = 0;
+					}
+					int total_minute = 0;
+					int toll = calculate_toll(prev, ptr, &total_minute);
+					total_amount += toll;
+					printf("%02d:%02d:%02d %02d:%02d:%02d %d $%0.2f\n", prev->day, prev->hour, prev->minute, ptr->day, ptr->hour, ptr->minute, total_minute, (float)toll/100);
+					print_total_flag = 1;
+				}
+				prev = ptr;
 				ptr = ptr->next;
-		}
-		if(print_total_flag){
-			printf("Total amount: $%0.2f\n", total_amount/100);
-			print_total_flag = 0;
+			}
+			if(print_total_flag){
+				printf("Total amount: $%0.2f\n", total_amount/100);
+				print_total_flag = 0;
+			}
 		}
 	}
 	return 0;
