@@ -5,7 +5,7 @@
 #define OFFLINE 0
 #define ONLINE 1
 int toll[24];
-typedef char name[20];
+typedef char name[21];
 typedef char state_name[10];
 typedef struct phone_bill_node* ptrto_bill_node;
 typedef ptrto_bill_node phone_bill;
@@ -56,7 +56,14 @@ void insert(phone_bill phone_bill_list, phone_bill new_phone_bill)
 						if(new_phone_bill->minute > ptr->minute){
 							prev = ptr;
 							ptr = ptr->next;
-						}else {
+						}else if(new_phone_bill->minute == ptr->minute){
+							if(new_phone_bill->state == OFFLINE){
+								prev = ptr;
+								ptr = ptr->next;
+							}else{
+								break;
+							}
+						}else{
 							break;
 						}
 					}else{
@@ -148,36 +155,39 @@ int main(int argc, char const *argv[])
 		ptrto_bill_node new_node = create_new_phone_bill();
 		insert(bill_list, new_node);
 	}
-	ptrto_bill_node prev ;
+	ptrto_bill_node prev;
 	ptrto_bill_node ptr = bill_list->next;
-
-	if(ptr->next != NULL){
-		while(ptr){
+	if(ptr == NULL || ptr->next == NULL)return 0;
+	prev = ptr;
+	ptr = ptr->next;
+	while(ptr){
+		float total_amount = 0;
+		int print_name_flag = 1;
+		int print_total_flag = 0;
+		while(ptr && strcmp(ptr->_name, prev->_name) == 0){
+			if(prev->state == ONLINE && ptr->state == OFFLINE){
+				if(print_name_flag){
+					printf("%s %02d\n", ptr->_name, ptr->month);
+					print_name_flag = 0;
+				}
+				int total_minute = 0;
+				int toll = calculate_toll(prev, ptr, &total_minute);
+				total_amount += toll;
+				printf("%02d:%02d:%02d %02d:%02d:%02d %d $%0.2f\n", prev->day, prev->hour, prev->minute, ptr->day, ptr->hour, ptr->minute, total_minute, (float)toll/100);
+				print_total_flag = 1;
+			}
 			prev = ptr;
 			ptr = ptr->next;
-			float total_amount = 0;
-			int print_name_flag = 1;
-			int print_total_flag = 0;
-			while(ptr && strcmp(ptr->_name, prev->_name) == 0){
-				if(prev->state == ONLINE && ptr->state == OFFLINE){
-					if(print_name_flag){
-						printf("%s %02d\n", ptr->_name, ptr->month);
-						print_name_flag = 0;
-					}
-					int total_minute = 0;
-					int toll = calculate_toll(prev, ptr, &total_minute);
-					total_amount += toll;
-					printf("%02d:%02d:%02d %02d:%02d:%02d %d $%0.2f\n", prev->day, prev->hour, prev->minute, ptr->day, ptr->hour, ptr->minute, total_minute, (float)toll/100);
-					print_total_flag = 1;
-				}
-				prev = ptr;
-				ptr = ptr->next;
-			}
-			if(print_total_flag){
-				printf("Total amount: $%0.2f\n", total_amount/100);
-				print_total_flag = 0;
-			}
 		}
+		if(print_total_flag){
+			printf("Total amount: $%0.2f\n", total_amount/100);
+			print_total_flag = 0;
+		}
+		prev = ptr;
+		if(ptr)
+			ptr = ptr->next;
+		else
+			break;
 	}
 	return 0;
 }
