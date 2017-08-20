@@ -103,7 +103,7 @@ int calculate_second(ptr_customer _customer, ptr_customer _window)
 		int hour = _customer->hour;
 		total_second = 60 - second;
 		minute++;
-		total_second = total_second + (60 - minute) * 60 + _window->minute * 60 +_window->second;
+		total_second = total_second + (60 - minute) * 60;
 		hour++;
 		total_second = total_second + (_window->hour - hour) * 3600 + _window->minute * 60 +_window->second;
 	}
@@ -120,6 +120,7 @@ int main(int argc, char const *argv[])
 {
 	int customer_num, window_num;
 	scanf("%d %d", &customer_num, &window_num);
+	if(window_num <= 0) return 0;
 	ptr_customer customer_list = (ptr_customer)malloc(sizeof(struct customer_node));
 	customer_list->next = NULL;
 	int i;
@@ -151,9 +152,7 @@ int main(int argc, char const *argv[])
 		total_customer++;
 		ptr = ptr->next;
 	}
-	if(total_customer == 0){
-		printf("0.0\n");
-	}else{
+	if(total_customer != 0){
 		printf("%0.1f\n", (float)total_second/60/total_customer);
 	}
 	return 0;
