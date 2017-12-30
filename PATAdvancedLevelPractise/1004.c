@@ -1,93 +1,70 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#define MAX 100
-int leaves[MAX];
-int visit[MAX];
-typedef struct child_node* PtrToChildNode;
-typedef PtrToChildNode child;
-struct child_node
-{
-	int child_id;
-	child next_brother;
-};
-typedef struct parent_node* parent;
-typedef struct parent_node{
-	child first_child;
-}* Parent[MAX];
-typedef struct family_tree_node* family;
-struct family_tree_node
-{
-	Parent _parent;
-	int member_num;
-	int non_child_member_num;
-};
 
-child create_child();
-void dfs_visit(int parent_id, PtrToChildNode _parent, int level);
+int N, M;
+int Parent[101], NonCount[101], Level[101], Child[101];
 
-family create_family()
+void Init()
 {
-	family fmy = (family)malloc(sizeof(struct family_tree_node));
-	scanf("%d %d", &(fmy->member_num), &(fmy->non_child_member_num));
+	scanf("%d %d", &N, &M);
+	memset(Child, 0, sizeof(int) * (N + 1));
 	int i;
-	for(i = 0; i < fmy->non_child_member_num; i++){
-		int id, child_num;
-		scanf("%d %d", &id, &child_num);
-		int j;
-		for(j = 0; j < child_num; j++){
-			if(j == 0){
-				fmy->_parent[id] = (parent)malloc(sizeof(struct parent_node));
-				fmy->_parent[id]->first_child = NULL;
-			}
-			child _child = create_child();
-			_child->next_brother = fmy->_parent[id]->first_child;
-			fmy->_parent[id]->first_child = _child;
+	for(i = 0; i < M; i++)
+	{
+		int parent, K;
+		scanf("%d %d", &parent, &K);
+		int j, child;
+		for(j = 0; j < K; j++)
+		{
+			scanf("%d", &child);
+			Parent[child] = parent;
+			Child[parent] = 1;
 		}
 	}
-	return fmy;
 }
 
-child create_child()
+void Solve()
 {
-	int id;
-	scanf("%d", &id);
-	child _child = (PtrToChildNode)malloc(sizeof(struct child_node));
-	_child->child_id = id;
-	return _child;
-}
-
-void dfs(family fmy)
-{
-	memset(visit, 0, sizeof(visit));
-	int i;
-	for(i = 0; i < fmy->member_num; i++)
-		if(visit[i] != 1){
-			dfs_visit(i, fmy->_parent[i]->first_child, 1);
+	int i, parent;
+	memset(Level, -1, sizeof(int) * (N + 1));
+	Level[1] = 1;
+	for(i = 2; i <= N; i++)
+	{
+		parent = Parent[i];
+		int level = 0;
+		while(parent != -1){
+			level++;
+			if(Level[parent] != -1)
+			{
+				level += Level[parent];
+				break;
+			}
+			parent = Parent[parent];
 		}
-}
-
-void dfs_visit(int parent_id, PtrToChildNode _parent, int level)
-{
-	visit[parent_id] = 1;
-	if(_parent == NULL){
-		printf("%d\n", __LINE__);
-		leaves[level]++;
-	}else{
-		PtrToChildNode _child = _parent->first_child;
-		printf("%d\n", __LINE__);
-		dfs_visit(_child->child_id, _child, level+1);
+		Level[i] = level;
+	}
+	int MaxLevel = 0;
+	memset(NonCount, 0, sizeof(int) * (N + 1));
+	for(i = 1; i <= N; i++)
+	{
+		if(Child[i] == 0)
+			NonCount[Level[i]]++;
+		if(Level[i] > MaxLevel)
+			MaxLevel = Level[i];
+	}
+	for(i = 1; i <= MaxLevel; i++)
+	{
+		printf("%d", NonCount[i]);
+		if(i != MaxLevel)
+			printf(" ");
+		else
+			printf("\n");
 	}
 }
 
 int main(int argc, char const *argv[])
 {
-	family fmy = create_family();
-	memset(leaves, 0, sizeof(leaves));
-	dfs(fmy);
-	int i;
-	printf("%d\n", leaves[0]);
-	for(i = 1; i < fmy->member_num - fmy->non_child_member_num; i++)
-		printf(" %d\n", leaves[i]);
+	Init();
+	Solve();
 	return 0;
 }
