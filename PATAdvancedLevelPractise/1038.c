@@ -17,6 +17,7 @@ void trim(char str[])
 		o_count++;
 		i++;
 	}
+	if(o_count == 0) return;
 	for(i = 0; i < len - o_count; i++)
 		str[i] = str[i + o_count];
 	str[i] = '\0';
@@ -27,18 +28,32 @@ int cmp(const void* sta, const void* stb)
 	int la = strlen(((ptr_str_node)sta)->string);
 	int lb = strlen(((ptr_str_node)stb)->string);
 	int i, j;
-	for(i = 0, j = 0; i < la && j < lb; i++, j++){
-		if(((ptr_str_node)sta)->string[i] > ((ptr_str_node)stb)->string[j])
-			return 1;
-		else if(((ptr_str_node)sta)->string[i] < ((ptr_str_node)stb)->string[j])
-			return 0;
+	for(i = 0, j = 0; i < la && j < lb; i++, j++)
+		if(((ptr_str_node)sta)->string[i] != ((ptr_str_node)stb)->string[j])
+			return ((ptr_str_node)sta)->string[i] - ((ptr_str_node)stb)->string[j];
+	
+	if(j < lb)  // a是b的前缀
+	{
+		i = 0;
+		while(j < lb)
+		{
+			if(((ptr_str_node)stb)->string[i] != ((ptr_str_node)stb)->string[j])
+				return ((ptr_str_node)stb)->string[i] - ((ptr_str_node)stb)->string[j];
+			i++;
+			j++;
+		}
 	}
-
-	if(i == la && j < lb)
-		return (((ptr_str_node)stb)->string[0] > ((ptr_str_node)stb)->string[j]);
-
-	if(j == lb && i < la)
-		return (((ptr_str_node)sta)->string[i] > ((ptr_str_node)sta)->string[0]);
+	if(i < la)  // b是a的前缀
+	{
+		j = 0;
+		while(i < la)
+		{
+			if(((ptr_str_node)sta)->string[i] != ((ptr_str_node)sta)->string[j])
+				return ((ptr_str_node)sta)->string[i] - ((ptr_str_node)sta)->string[j];
+			i++;
+			j++;
+		}
+	}
 	return 0;
 }
 
@@ -67,4 +82,3 @@ int main(int argc, char const *argv[])
 	printf("\n");
 	return 0;
 }
-// 3 012 0 0000
