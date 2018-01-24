@@ -108,57 +108,14 @@ int Max(int a, int b)
 		return b;
 }
 
-// void bellman_ford(Graph graph, Vertex s, Vertex d)
-// {
-// 	initialize_single_source(graph, s);
-// 	Vertex v, w;
-// 	PtrToAdjNode adj;
-// 	int shortest_path = 0;
-// 	// 初始化源结点到每个结点的队伍数量
-// 	int teamCount[graph->num_vertex];
-// 	memset(teamCount, 0, sizeof(teamCount));
-// 	teamCount[s] = graph->G[s].data;
-
-// 	for(w = 0; w < graph->num_vertex - 1; w++){
-// 		for(v = 0; v < graph->num_vertex; v++){
-// 			adj = graph->G[v].first_edge;
-// 			while(adj != NULL){
-// 				Vertex u = adj->adjV;
-// 				if(u == d && w == (graph->num_vertex - 2)){
-// 					if(graph->G[u].d > graph->G[v].d + adj->weight){
-// 						graph->G[u].d = graph->G[v].d + adj->weight;
-// 						graph->G[u].front = v;
-// 						shortest_path = 1;
-// 						teamCount[u] = Max(teamCount[u], teamCount[v] + graph->G[u].data);
-// 					}else if(graph->G[u].d == graph->G[v].d + adj->weight){
-// 						shortest_path++;
-// 						teamCount[u] = Max(teamCount[u], teamCount[v] + graph->G[u].data);
-// 					}
-// 				}else{
-// 					if(graph->G[u].d > graph->G[v].d + adj->weight){
-// 						graph->G[u].d = graph->G[v].d + adj->weight;
-// 						graph->G[u].front = v;
-// 						teamCount[u] = Max(teamCount[u], teamCount[v] + graph->G[u].data);
-// 					}
-// 				}
-// 				adj = adj->next;
-// 			}
-// 		}
-// 	}
-// 	printf("%d %d\n", shortest_path, teamCount[d]);
-// }
-
 void dijkstra(Graph graph, Vertex s, Vertex d)
 {
 
 	int team_count[graph->num_vertex];
 	memset(team_count, 0, sizeof(team_count));
-
 	int shortest_path[graph->num_vertex];
 	memset(shortest_path, 0, sizeof(shortest_path));
-
 	initialize_single_source(graph, s);
-
 	team_count[s] = graph->G[s].data;
 	shortest_path[s] = 1;
 	while(1){
@@ -171,7 +128,7 @@ void dijkstra(Graph graph, Vertex s, Vertex d)
 			u = adj->adjV;
 			if(graph->G[u].d > graph->G[v].d + adj->weight){
 				graph->G[u].d = graph->G[v].d + adj->weight;
-				team_count[u] = Max(team_count[u], team_count[v] + graph->G[u].data);
+				team_count[u] = team_count[v] + graph->G[u].data;
 				shortest_path[u] = shortest_path[v];
 			}else if(graph->G[u].d == graph->G[v].d + adj->weight){
 				shortest_path[u] = shortest_path[v] + shortest_path[u];
@@ -180,10 +137,7 @@ void dijkstra(Graph graph, Vertex s, Vertex d)
 			adj = adj->next;
 		}
 	}
-	// if(s != d)
 	printf("%d %d\n", shortest_path[d], team_count[d]);
-	// else
-	// 	printf("%d %d\n", 1, graph->G[s].data);
 }
 
 Vertex find_mindist(Graph graph)
@@ -199,16 +153,7 @@ Vertex find_mindist(Graph graph)
 	}
 	return min_vertex;
 }
-/*
-5 6 0 2
-1 2 1 5 3
-0 1 1
-0 2 2
-0 3 1
-1 2 1
-2 4 1
-3 4 1
-*/
+
 int main(int argc, char const *argv[])
 {
 	int nv, ne, s, d;

@@ -50,7 +50,7 @@ void DFS(int v)
 		return;
 	if(v == Sp)
 	{
-		// printf("cur_len = %d, cur_back = %d, cur_send = %d\n", cur_len, cur_back, cur_send);
+		printf("cur_len = %d, cur_back = %d, cur_send = %d\n", cur_len, cur_back, cur_send);
 		if(cur_len < min_len)
 		{
 			CurToMin();

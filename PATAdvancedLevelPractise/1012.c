@@ -72,22 +72,6 @@ int main(int argc, char const *argv[])
 		English[i] = count + 1;
 		count = 0;
 	}
-	// printf("----------Average----------\n");
-	// for(i = 0; i < N; i++)
-	// 	printf("%d\t", Average[i]);
-	// printf("\n----------Average----------\n");
-	// printf("----------Clanguage----------\n");
-	// for(i = 0; i < N; i++)
-	// 	printf("%d\t", Clanguage[i]);
-	// printf("\n----------Clanguage----------\n");
-	// printf("----------Math----------\n");
-	// for(i = 0; i < N; i++)
-	// 	printf("%d\t", Math[i]);
-	// printf("\n----------Math----------\n");
-	// printf("----------English----------\n");
-	// for(i = 0; i < N; i++)
-	// 	printf("%d\t", English[i]);
-	// printf("\n----------English----------\n");
 
 	for(i = 0; i < M; i++){
 		// 判断该学生是否存在
